@@ -38,9 +38,59 @@
         <div id="page-content-wrapper" class="w-100 bg-light overflow-auto p-4">
           
           <div id="page-dashboard" class="page-section">
-            <h1 class="h2 mb-3">Javítási Napló (Dashboard)</h1>
-            <p class="text-muted">A folyamatban lévő munkák listája és szűrése.</p>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h1 class="h2 mb-1">Javítási Napló</h1>
+                <p class="text-muted mb-0">Aktuális szervizigények és folyamatban lévő munkák követése.</p>
+              </div>
+              <div class="text-end">
+                <span class="badge bg-primary fs-6" id="total-repairs-count">0 db aktív munka</span>
+              </div>
             </div>
+
+            <div class="card shadow-sm border-0 mb-4">
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="input-group">
+                      <span class="input-group-text bg-white border-end-0 text-muted">
+                        <i class="bi bi-search"></i>
+                      </span>
+                      <input type="text" id="search-input" class="form-control border-start-0 ps-0" placeholder="Keresés ügyfél neve vagy eszköz alapján...">
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <select id="status-filter" class="form-select">
+                      <option value="all">🔍 Összes státusz megjelenítése</option>
+                      <option value="Alkatrészre vár">⏳ Alkatrészre vár</option>
+                      <option value="Folyamatban">⚙️ Folyamatban</option>
+                      <option value="Kész">✅ Kész</option>
+                      <option value="Átvéve">📦 Átvéve</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-dark">
+                    <tr>
+                      <th style="width: 80px;">ID</th>
+                      <th>Ügyfél neve</th>
+                      <th>Eszköz</th>
+                      <th>Hiba leírása</th>
+                      <th>Státusz</th>
+                      <th class="text-end" style="width: 120px;">Műveletek</th>
+                    </tr>
+                  </thead>
+                  <tbody id="repairs-table-body">
+                    </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
 
           <div id="page-raktar" class="page-section d-none">
             <h1 class="h2 mb-3">Raktárkészlet</h1>
