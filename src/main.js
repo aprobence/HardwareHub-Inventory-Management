@@ -3,39 +3,71 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './style.css';
 
-let mockRepairs = [
-  { id: 1, ugyfel_nev: 'Kovács Péter', eszkoz_tipus: 'Asztali PC', hiba_leiras: 'Lassú a rendszer, Windows nem bootol. SSD csere szükséges.', statusz: 'Alkatrészre vár' },
-  { id: 2, ugyfel_nev: 'Nagy Alíz', eszkoz_tipus: 'Lenovo IdeaPad', hiba_leiras: 'Nem kapcsol be, zárlatosnak tűnik a tápegység.', statusz: 'Folyamatban' },
-  { id: 3, ugyfel_nev: 'Szabó Gábor', eszkoz_tipus: 'Asztali PC', hiba_leiras: 'Kékhalál játékok közben. Memóriateszt javasolt.', statusz: 'Folyamatban' },
-  { id: 4, ugyfel_nev: 'Kiss Éva', eszkoz_tipus: 'Asus ROG Laptop', hiba_leiras: 'Gyorsítást kért a tulajdonos, 1TB M.2 SSD beépítve.', statusz: 'Kész' },
-  { id: 5, ugyfel_nev: 'Tóth Dániel', eszkoz_tipus: 'MacBook Pro 2015', hiba_leiras: 'Akkumulátorcsere és teljes belső portalanítás.', statusz: 'Átvéve' }
-];
-
-let mockInventory = [
-  { id: 1, alkatresz_nev: 'Kingston A400 480GB SSD', darabszam: 12, kritikus_szint: 3 },
-  { id: 2, alkatresz_nev: 'Crucial 8GB DDR4 3200MHz RAM', darabszam: 5, kritikus_szint: 4 },
-  { id: 3, alkatresz_nev: 'GIGABYTE P650B 650W Tápegység', darabszam: 1, kritikus_szint: 3 },
-  { id: 4, alkatresz_nev: 'Samsung 980 1TB M.2 NVMe SSD', darabszam: 8, kritikus_szint: 2 },
-  { id: 5, alkatresz_nev: 'Corsair Vengeance 16GB DDR5 RAM', darabszam: 0, kritikus_szint: 2 }
-];
+const API_JAVITASOK_URL = "https://retoolapi.dev/w7C9sW/javitasok";
+const API_RAKTAR_URL = "https://retoolapi.dev/ljj6c0/raktar";
 
 const HardwareHubAPI = {
+  
   fetchRepairs: async () => {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve([...mockRepairs]), 300);
-    });
+    const response = await fetch(API_JAVITASOK_URL);
+    return await response.json();
   },
+
   fetchInventory: async () => {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve([...mockInventory]), 300);
+    const response = await fetch(API_RAKTAR_URL);
+    return await response.json();
+  },
+
+  addRepair: async (repairData) => {
+    const response = await fetch(API_JAVITASOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(repairData)
+    });
+    return await response.json();
+  },
+
+  addPart: async (partData) => {
+    const response = await fetch(API_RAKTAR_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(partData)
+    });
+    return await response.json();
+  },
+
+  updatePartQuantity: async (id, newQty) => {
+    await fetch(`${API_RAKTAR_URL}/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ darabszam: newQty })
     });
   }
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
-  
   const navLinks = document.querySelectorAll('#nav-links .nav-link');
   const pages = document.querySelectorAll('.page-section');
+
+  async function populatePartDropdown() {
+    const partSelect = document.getElementById('repair-part');
+    if (!partSelect) return;
+    
+    try {
+      const currentInventory = await HardwareHubAPI.fetchInventory();
+      partSelect.innerHTML = '<option value="">-- Nem igényel raktári alkatrészt --</option>';
+      
+      currentInventory.forEach(part => {
+        if (part.alkatresz_nev) {
+          partSelect.innerHTML += `<option value="${part.id}">${part.alkatresz_nev} (${part.darabszam} db van)</option>`;
+        }
+      });
+    } catch (error) {
+      console.error("Hiba a legördülő menü betöltésekor:", error);
+    }
+  }
+  
+  await populatePartDropdown();
 
   navLinks.forEach(link => {
     link.addEventListener('click', async (event) => {
@@ -48,9 +80,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       const targetPage = document.getElementById(`page-${targetPageId}`);
       if (targetPage) targetPage.classList.remove('d-none');
 
+      if (targetPageId === 'dashboard') {
+        const freshRepairs = await HardwareHubAPI.fetchRepairs();
+        renderRepairs(freshRepairs);
+      }
       if (targetPageId === 'raktar') {
         const freshInventory = await HardwareHubAPI.fetchInventory();
         renderInventory(freshInventory);
+      }
+      if (targetPageId === 'adatfelvetel') {
+        await populatePartDropdown();
       }
     });
   });
@@ -61,22 +100,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   const totalCountSpan = document.getElementById('total-repairs-count');
 
   function getStatusBadge(statusz) {
-    switch (statusz) {
+    const st = statusz ? statusz.toString().trim() : 'Alkatrészre vár';
+    switch (st) {
       case 'Alkatrészre vár': return `<span class="badge bg-warning text-dark shadow-sm">⏳ Alkatrészre vár</span>`;
       case 'Folyamatban': return `<span class="badge bg-primary shadow-sm">⚙️ Folyamatban</span>`;
       case 'Kész': return `<span class="badge bg-success shadow-sm">✅ Kész</span>`;
       case 'Átvéve': return `<span class="badge bg-secondary shadow-sm">📦 Átvéve</span>`;
-      default: return `<span class="badge bg-light text-dark shadow-sm">${statusz}</span>`;
+      default: return `<span class="badge bg-light text-dark shadow-sm">${st}</span>`;
     }
   }
 
   function renderRepairs(data) {
     if (!tableBody) return;
     tableBody.innerHTML = '';
-    totalCountSpan.textContent = `${data.length} db aktív munka`;
+    totalCountSpan.textContent = `${data.length} db munka a felhőben`;
 
     if (data.length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Nincs a keresésnek megfelelő találat.</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Nincs adat az online adatbázisban.</td></tr>`;
       return;
     }
 
@@ -84,9 +124,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const row = document.createElement('tr');
       row.innerHTML = `
         <td class="text-muted fw-bold">#${item.id}</td>
-        <td class="fw-bold text-dark">${item.ugyfel_nev}</td>
-        <td><i class="bi bi-laptop me-1 text-muted"></i> ${item.eszkoz_tipus}</td>
-        <td><span class="d-inline-block text-truncate" style="max-width: 300px;" title="${item.hiba_leiras}">${item.hiba_leiras}</span></td>
+        <td class="fw-bold text-dark">${item.ugyfel_nev || 'Nincs név'}</td>
+        <td><i class="bi bi-laptop me-1 text-muted"></i> ${item.eszkoz_tipus || 'Ismeretlen'}</td>
+        <td><span class="d-inline-block text-truncate" style="max-width: 300px;" title="${item.hiba_leiras || ''}">${item.hiba_leiras || 'Nincs leírás.'}</span></td>
         <td>${getStatusBadge(item.statusz)}</td>
         <td class="text-end">
           <button class="btn btn-sm btn-outline-dark me-1" title="Szerkesztés">
@@ -101,16 +141,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function filterData() {
     const searchText = searchInput.value.toLowerCase();
     const selectedStatus = statusFilter.value;
-    
     const repairsFromServer = await HardwareHubAPI.fetchRepairs();
 
     const filtered = repairsFromServer.filter(item => {
-      const matchesSearch = item.ugyfel_nev.toLowerCase().includes(searchText) || 
-                            item.eszkoz_tipus.toLowerCase().includes(searchText);
+      const client = (item.ugyfel_nev || '').toLowerCase();
+      const device = (item.eszkoz_tipus || '').toLowerCase();
+      const matchesSearch = client.includes(searchText) || device.includes(searchText);
       const matchesStatus = selectedStatus === 'all' || item.statusz === selectedStatus;
       return matchesSearch && matchesStatus;
     });
-
     renderRepairs(filtered);
   }
 
@@ -126,15 +165,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     inventoryTableBody.innerHTML = '';
 
     inventoryData.forEach(item => {
+      if (!item.alkatresz_nev) return;
       const row = document.createElement('tr');
-      const isCritical = item.darabszam <= item.kritikus_szint;
+      const qty = parseInt(item.darabszam) || 0;
+      const limit = parseInt(item.kritikus_szint) || 0;
+      
+      const isCritical = qty <= limit;
       if (isCritical) row.classList.add('table-danger');
 
       row.innerHTML = `
         <td class="text-muted fw-bold">#${item.id}</td>
         <td class="fw-bold">${item.alkatresz_nev}</td>
-        <td class="text-center fs-6 fw-bold ${isCritical ? 'text-danger' : 'text-dark'}">${item.darabszam}</td>
-        <td class="text-center text-muted">${item.kritikus_szint}</td>
+        <td class="text-center fs-6 fw-bold ${isCritical ? 'text-danger' : 'text-dark'}">${qty}</td>
+        <td class="text-center text-muted">${limit}</td>
         <td>
           ${isCritical 
             ? `<span class="text-danger fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i> Beszerzés szükséges!</span>` 
@@ -159,22 +202,30 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       event.preventDefault();
 
+      const selectedPartId = document.getElementById('repair-part').value;
+
+      if (selectedPartId) {
+        const currentInventory = await HardwareHubAPI.fetchInventory();
+        const part = currentInventory.find(p => p.id == selectedPartId);
+        if (part && parseInt(part.darabszam) > 0) {
+          const newQty = (parseInt(part.darabszam) || 1) - 1;
+          await HardwareHubAPI.updatePartQuantity(selectedPartId, newQty);
+        }
+      }
+
       const newRepair = {
-        id: mockRepairs.length + 1,
         ugyfel_nev: document.getElementById('repair-client').value,
         eszkoz_tipus: document.getElementById('repair-device').value,
         hiba_leiras: document.getElementById('repair-description').value || 'Nincs leírás.',
         statusz: 'Alkatrészre vár'
       };
 
-      mockRepairs.push(newRepair);
-      
-      const freshData = await HardwareHubAPI.fetchRepairs();
-      renderRepairs(freshData);
+      await HardwareHubAPI.addRepair(newRepair);
 
       repairForm.reset();
       repairForm.classList.remove('was-validated');
-      alert('Szervizigény sikeresen rögzítve!');
+      await populatePartDropdown();
+      alert('Szervizigény sikeresen beküldve az online Retool API-ba!');
     });
   }
 
@@ -189,22 +240,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       event.preventDefault();
 
       const newPart = {
-        id: mockInventory.length + 1,
         alkatresz_nev: document.getElementById('part-name').value,
-        darabszam: parseInt(document.getElementById('part-qty').value),
-        kritikus_szint: parseInt(document.getElementById('part-limit').value)
+        darabszam: parseInt(document.getElementById('part-qty').value) || 0,
+        kritikus_szint: parseInt(document.getElementById('part-limit').value) || 0
       };
 
-      mockInventory.push(newPart);
+      await HardwareHubAPI.addPart(newPart);
 
       partForm.reset();
       partForm.classList.remove('was-validated');
-      alert('Új alkatrész sikeresen hozzáadva a raktárhoz!');
+      alert('Új alkatrész sikeresen feltöltve az online raktárba!');
     });
   }
 
-  if (tableBody) {
+  try {
     const initialRepairs = await HardwareHubAPI.fetchRepairs();
     renderRepairs(initialRepairs);
+  } catch (err) {
+    console.error("Nem sikerült elérni a Retool felhőt:", err);
   }
 });
