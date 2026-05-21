@@ -127,9 +127,79 @@
           </div>
 
           <div id="page-adatfelvetel" class="page-section d-none">
-            <h1 class="h2 mb-3">Új Adatok Rögzítése</h1>
-            <p class="text-muted">Szervizigények és új raktári tételek hozzáadása.</p>
+            <h1 class="h2 mb-1">Új Adatok Rögzítése</h1>
+            <p class="text-muted mb-4">Új szervizigények bevitele vagy raktári alkatrészek készletének bővítése.</p>
+
+            <div class="row g-4">
+              <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                  <div class="card-header bg-dark text-white fw-bold py-3">
+                    <i class="bi bi-tools me-2"></i> Új szervizigény felvétele
+                  </div>
+                  <div class="card-body p-4">
+                    <form id="form-new-repair" class="needs-validation" novalidate>
+                      <div class="mb-3">
+                        <label for="repair-client" class="form-label fw-bold">Ügyfél neve</label>
+                        <input type="text" class="form-control" id="repair-client" required placeholder="Pl. Kiss Gábor">
+                        <div class="invalid-feedback">Kérjük, adja meg az ügyfél nevét!</div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="repair-device" class="form-label fw-bold">Eszköz típusa</label>
+                        <input type="text" class="form-control" id="repair-device" required placeholder="Pl. ASUS ZenBook Laptop">
+                        <div class="invalid-feedback">Kérjük, adja meg az eszköz típusát!</div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="repair-part" class="form-label fw-bold">Szükséges alkatrész (Raktárból)</label>
+                        <select class="form-select" id="repair-part">
+                          <option value="">-- Nem igényel raktári alkatrészt --</option>
+                          <option value="1">Kingston A400 480GB SSD</option>
+                          <option value="2">Crucial 8GB DDR4 RAM</option>
+                          <option value="3">GIGABYTE P650B Tápegység</option>
+                        </select>
+                      </div>
+                      <div class="mb-3">
+                        <label for="repair-description" class="form-label fw-bold">Hiba részletes leírása</label>
+                        <textarea class="form-control" id="repair-description" rows="3" placeholder="Mi a probléma az eszközzel?"></textarea>
+                      </div>
+                      <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+                        <i class="bi bi-plus-circle me-1"></i> Szervizigény rögzítése
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-6">
+                <div class="card shadow-sm border-0 h-100">
+                  <div class="card-header bg-dark text-white fw-bold py-3">
+                    <i class="bi bi-box-seam me-2"></i> Új raktári tétel hozzáadása
+                  </div>
+                  <div class="card-body p-4">
+                    <form id="form-new-part" class="needs-validation" novalidate>
+                      <div class="mb-3">
+                        <label for="part-name" class="form-label fw-bold">Alkatrész megnevezése</label>
+                        <input type="text" class="form-control" id="part-name" required placeholder="Pl. WD Blue 1TB HDD">
+                        <div class="invalid-feedback">Kérjük, adja meg az alkatrész nevét!</div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="part-qty" class="form-label fw-bold">Kezdő darabszám</label>
+                        <input type="number" class="form-control" id="part-qty" min="0" required placeholder="0">
+                        <div class="invalid-feedback">A darabszám nem lehet negatív!</div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="part-limit" class="form-label fw-bold">Kritikus minimum szint</label>
+                        <input type="number" class="form-control" id="part-limit" min="1" required placeholder="2">
+                        <div class="invalid-feedback">A kritikus szint legalább 1 kell legyen!</div>
+                      </div>
+                      <button type="submit" class="btn btn-success w-100 py-2 fw-bold">
+                        <i class="bi bi-plus-circle me-1"></i> Alkatrész hozzáadása
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
 
         </div>
       </div>

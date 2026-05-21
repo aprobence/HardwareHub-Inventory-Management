@@ -148,4 +148,65 @@ document.addEventListener('DOMContentLoaded', () => {
   if (tableBody) {
     renderRepairs(mockRepairs);
   }
+
+  
+  const repairForm = document.getElementById('form-new-repair');
+  const partForm = document.getElementById('form-new-part');
+
+ 
+  if (repairForm) {
+    repairForm.addEventListener('submit', (event) => {
+     
+      if (!repairForm.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+        repairForm.classList.add('was-validated');
+        return;
+      }
+      event.preventDefault(); 
+
+      const newRepair = {
+        id: mockRepairs.length + 1,
+        ugyfel_nev: document.getElementById('repair-client').value,
+        eszkoz_tipus: document.getElementById('repair-device').value,
+        hiba_leiras: document.getElementById('repair-description').value || 'Nincs leírás.',
+        statusz: 'Alkatrészre vár' 
+      };
+
+      mockRepairs.push(newRepair);
+      renderRepairs(mockRepairs);
+
+      repairForm.reset();
+      repairForm.classList.remove('was-validated');
+      
+      alert('Szervizigény sikeresen rögzítve! Keresd a Javítási Naplóban.');
+    });
+  }
+
+  if (partForm) {
+    partForm.addEventListener('submit', (event) => {
+      if (!partForm.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+        partForm.classList.add('was-validated');
+        return;
+      }
+      event.preventDefault();
+
+      const newPart = {
+        id: mockInventory.length + 1,
+        alkatresz_nev: document.getElementById('part-name').value,
+        darabszam: parseInt(document.getElementById('part-qty').value),
+        kritikus_szint: parseInt(document.getElementById('part-limit').value)
+      };
+
+      mockInventory.push(newPart);
+      renderInventory(mockInventory);
+
+      partForm.reset();
+      partForm.classList.remove('was-validated');
+      
+      alert('Új alkatrész sikeresen hozzáadva a raktárhoz!');
+    });
+  }
 });
