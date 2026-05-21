@@ -93,9 +93,38 @@
           </div>
 
           <div id="page-raktar" class="page-section d-none">
-            <h1 class="h2 mb-3">Raktárkészlet</h1>
-            <p class="text-muted">Elérhető alkatrészek és készlethiány riasztások.</p>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h1 class="h2 mb-1">Raktárkészlet</h1>
+                <p class="text-muted mb-0">Elérhető alkatrészek adminisztrációja és automata készlethiány-riasztás.</p>
+              </div>
             </div>
+
+            <div class="alert alert-info border-0 shadow-sm mb-4 d-flex align-items-center" role="alert">
+              <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+              <div>
+                <strong>Riasztási logika:</strong> Ha egy alkatrész darabszáma a beállított kritikus szint alá süllyed, a rendszer automatikusan <span class="text-danger fw-bold">piros kiemeléssel</span> és figyelmeztető ikonnal jelzi a beszerzés szükségességét.
+              </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="inventory-table">
+                  <thead class="table-dark">
+                    <tr>
+                      <th style="width: 80px;">ID</th>
+                      <th>Alkatrész megnevezése</th>
+                      <th class="text-center" style="width: 150px;">Készlet (db)</th>
+                      <th class="text-center" style="width: 180px;">Kritikus szint (db)</th>
+                      <th style="width: 180px;">Állapot</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inventory-table-body">
+                    </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
 
           <div id="page-adatfelvetel" class="page-section d-none">
             <h1 class="h2 mb-3">Új Adatok Rögzítése</h1>
