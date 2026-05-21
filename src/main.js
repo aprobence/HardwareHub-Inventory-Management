@@ -11,6 +11,15 @@ const mockRepairs = [
   { id: 5, ugyfel_nev: 'Tóth Dániel', eszkoz_tipus: 'MacBook Pro 2015', hiba_leiras: 'Akkumulátorcsere és teljes belső portalanítás.', statusz: 'Átvéve' }
 ];
 
+
+const mockInventory = [
+  { id: 1, alkatresz_nev: 'Kingston A400 480GB SSD', darabszam: 12, kritikus_szint: 3 },
+  { id: 2, alkatresz_nev: 'Crucial 8GB DDR4 3200MHz RAM', darabszam: 5, kritikus_szint: 4 },
+  { id: 3, alkatresz_nev: 'GIGABYTE P650B 650W Tápegység', darabszam: 1, kritikus_szint: 3 }, 
+  { id: 4, alkatresz_nev: 'Samsung 980 1TB M.2 NVMe SSD', darabszam: 8, kritikus_szint: 2 },
+  { id: 5, alkatresz_nev: 'Corsair Vengeance 16GB DDR5 RAM', darabszam: 0, kritikus_szint: 2 } 
+];
+
 document.addEventListener('DOMContentLoaded', () => {
   
   const navLinks = document.querySelectorAll('#nav-links .nav-link');
@@ -95,6 +104,45 @@ document.addEventListener('DOMContentLoaded', () => {
   if (searchInput && statusFilter) {
     searchInput.addEventListener('input', filterData);
     statusFilter.addEventListener('change', filterData);
+  }
+
+  
+  const inventoryTableBody = document.getElementById('inventory-table-body');
+
+  function renderInventory(inventoryData) {
+    if (!inventoryTableBody) return;
+    inventoryTableBody.innerHTML = '';
+
+    inventoryData.forEach(item => {
+      const row = document.createElement('tr');
+      
+      
+      const isCritical = item.darabszam <= item.kritikus_szint;
+      
+      
+      if (isCritical) {
+        row.classList.add('table-danger');
+      }
+
+      row.innerHTML = `
+        <td class="text-muted fw-bold">#${item.id}</td>
+        <td class="fw-bold">${item.alkatresz_nev}</td>
+        <td class="text-center fs-6 fw-bold ${isCritical ? 'text-danger' : 'text-dark'}">${item.darabszam}</td>
+        <td class="text-center text-muted">${item.kritikus_szint}</td>
+        <td>
+          ${isCritical 
+            ? `<span class="text-danger fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i> Beszerzés szükséges!</span>` 
+            : `<span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i> Megfelelő</span>`
+          }
+        </td>
+      `;
+      inventoryTableBody.appendChild(row);
+    });
+  }
+
+  
+  if (inventoryTableBody) {
+    renderInventory(mockInventory);
   }
 
   if (tableBody) {
