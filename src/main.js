@@ -3,7 +3,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './style.css';
 
-const mockRepairs = [
+let mockRepairs = [
   { id: 1, ugyfel_nev: 'Kovács Péter', eszkoz_tipus: 'Asztali PC', hiba_leiras: 'Lassú a rendszer, Windows nem bootol. SSD csere szükséges.', statusz: 'Alkatrészre vár' },
   { id: 2, ugyfel_nev: 'Nagy Alíz', eszkoz_tipus: 'Lenovo IdeaPad', hiba_leiras: 'Nem kapcsol be, zárlatosnak tűnik a tápegység.', statusz: 'Folyamatban' },
   { id: 3, ugyfel_nev: 'Szabó Gábor', eszkoz_tipus: 'Asztali PC', hiba_leiras: 'Kékhalál játékok közben. Memóriateszt javasolt.', statusz: 'Folyamatban' },
@@ -11,37 +11,49 @@ const mockRepairs = [
   { id: 5, ugyfel_nev: 'Tóth Dániel', eszkoz_tipus: 'MacBook Pro 2015', hiba_leiras: 'Akkumulátorcsere és teljes belső portalanítás.', statusz: 'Átvéve' }
 ];
 
-
-const mockInventory = [
+let mockInventory = [
   { id: 1, alkatresz_nev: 'Kingston A400 480GB SSD', darabszam: 12, kritikus_szint: 3 },
   { id: 2, alkatresz_nev: 'Crucial 8GB DDR4 3200MHz RAM', darabszam: 5, kritikus_szint: 4 },
-  { id: 3, alkatresz_nev: 'GIGABYTE P650B 650W Tápegység', darabszam: 1, kritikus_szint: 3 }, 
+  { id: 3, alkatresz_nev: 'GIGABYTE P650B 650W Tápegység', darabszam: 1, kritikus_szint: 3 },
   { id: 4, alkatresz_nev: 'Samsung 980 1TB M.2 NVMe SSD', darabszam: 8, kritikus_szint: 2 },
-  { id: 5, alkatresz_nev: 'Corsair Vengeance 16GB DDR5 RAM', darabszam: 0, kritikus_szint: 2 } 
+  { id: 5, alkatresz_nev: 'Corsair Vengeance 16GB DDR5 RAM', darabszam: 0, kritikus_szint: 2 }
 ];
 
-document.addEventListener('DOMContentLoaded', () => {
+const HardwareHubAPI = {
+  fetchRepairs: async () => {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve([...mockRepairs]), 300);
+    });
+  },
+  fetchInventory: async () => {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve([...mockInventory]), 300);
+    });
+  }
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
   
   const navLinks = document.querySelectorAll('#nav-links .nav-link');
   const pages = document.querySelectorAll('.page-section');
 
   navLinks.forEach(link => {
-    link.addEventListener('click', (event) => {
+    link.addEventListener('click', async (event) => {
       event.preventDefault();
-
       navLinks.forEach(l => l.classList.remove('active'));
       link.classList.add('active');
-
       pages.forEach(page => page.classList.add('d-none'));
 
       const targetPageId = link.getAttribute('data-page');
       const targetPage = document.getElementById(`page-${targetPageId}`);
-      if (targetPage) {
-        targetPage.classList.remove('d-none');
+      if (targetPage) targetPage.classList.remove('d-none');
+
+      if (targetPageId === 'raktar') {
+        const freshInventory = await HardwareHubAPI.fetchInventory();
+        renderInventory(freshInventory);
       }
     });
   });
-
 
   const tableBody = document.getElementById('repairs-table-body');
   const searchInput = document.getElementById('search-input');
@@ -59,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderRepairs(data) {
+    if (!tableBody) return;
     tableBody.innerHTML = '';
     totalCountSpan.textContent = `${data.length} db aktív munka`;
 
@@ -85,16 +98,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function filterData() {
+  async function filterData() {
     const searchText = searchInput.value.toLowerCase();
     const selectedStatus = statusFilter.value;
+    
+    const repairsFromServer = await HardwareHubAPI.fetchRepairs();
 
-    const filtered = mockRepairs.filter(item => {
+    const filtered = repairsFromServer.filter(item => {
       const matchesSearch = item.ugyfel_nev.toLowerCase().includes(searchText) || 
                             item.eszkoz_tipus.toLowerCase().includes(searchText);
-      
       const matchesStatus = selectedStatus === 'all' || item.statusz === selectedStatus;
-      
       return matchesSearch && matchesStatus;
     });
 
@@ -106,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
     statusFilter.addEventListener('change', filterData);
   }
 
-  
   const inventoryTableBody = document.getElementById('inventory-table-body');
 
   function renderInventory(inventoryData) {
@@ -115,14 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     inventoryData.forEach(item => {
       const row = document.createElement('tr');
-      
-      
       const isCritical = item.darabszam <= item.kritikus_szint;
-      
-      
-      if (isCritical) {
-        row.classList.add('table-danger');
-      }
+      if (isCritical) row.classList.add('table-danger');
 
       row.innerHTML = `
         <td class="text-muted fw-bold">#${item.id}</td>
@@ -140,51 +146,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  
-  if (inventoryTableBody) {
-    renderInventory(mockInventory);
-  }
-
-  if (tableBody) {
-    renderRepairs(mockRepairs);
-  }
-
-  
   const repairForm = document.getElementById('form-new-repair');
   const partForm = document.getElementById('form-new-part');
 
- 
   if (repairForm) {
-    repairForm.addEventListener('submit', (event) => {
-     
+    repairForm.addEventListener('submit', async (event) => {
       if (!repairForm.checkValidity()) {
         event.preventDefault();
         event.stopPropagation();
         repairForm.classList.add('was-validated');
         return;
       }
-      event.preventDefault(); 
+      event.preventDefault();
 
       const newRepair = {
         id: mockRepairs.length + 1,
         ugyfel_nev: document.getElementById('repair-client').value,
         eszkoz_tipus: document.getElementById('repair-device').value,
         hiba_leiras: document.getElementById('repair-description').value || 'Nincs leírás.',
-        statusz: 'Alkatrészre vár' 
+        statusz: 'Alkatrészre vár'
       };
 
       mockRepairs.push(newRepair);
-      renderRepairs(mockRepairs);
+      
+      const freshData = await HardwareHubAPI.fetchRepairs();
+      renderRepairs(freshData);
 
       repairForm.reset();
       repairForm.classList.remove('was-validated');
-      
-      alert('Szervizigény sikeresen rögzítve! Keresd a Javítási Naplóban.');
+      alert('Szervizigény sikeresen rögzítve!');
     });
   }
 
   if (partForm) {
-    partForm.addEventListener('submit', (event) => {
+    partForm.addEventListener('submit', async (event) => {
       if (!partForm.checkValidity()) {
         event.preventDefault();
         event.stopPropagation();
@@ -201,12 +196,15 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       mockInventory.push(newPart);
-      renderInventory(mockInventory);
 
       partForm.reset();
       partForm.classList.remove('was-validated');
-      
       alert('Új alkatrész sikeresen hozzáadva a raktárhoz!');
     });
+  }
+
+  if (tableBody) {
+    const initialRepairs = await HardwareHubAPI.fetchRepairs();
+    renderRepairs(initialRepairs);
   }
 });
