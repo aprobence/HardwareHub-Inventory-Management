@@ -9,21 +9,17 @@ const API_RAKTAR_URL = "https://retoolapi.dev/ljj6c0/raktar";
 const HardwareHubAPI = {
   fetchRepairs: async () => {
     const response = await fetch(API_JAVITASOK_URL);
-
     if (!response.ok) {
       throw new Error('Nem sikerült betölteni a javításokat.');
     }
-
     return await response.json();
   },
 
   fetchInventory: async () => {
     const response = await fetch(API_RAKTAR_URL);
-
     if (!response.ok) {
       throw new Error('Nem sikerült betölteni a raktárkészletet.');
     }
-
     return await response.json();
   },
 
@@ -33,7 +29,6 @@ const HardwareHubAPI = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(repairData)
     });
-
     if (!response.ok) {
       throw new Error('Nem sikerült hozzáadni a javítást.');
     }
@@ -45,7 +40,6 @@ const HardwareHubAPI = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(partData)
     });
-
     if (!response.ok) {
       throw new Error('Nem sikerült hozzáadni az alkatrészt.');
     }
@@ -57,7 +51,6 @@ const HardwareHubAPI = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ darabszam: newQty })
     });
-
     if (!response.ok) {
       throw new Error('Nem sikerült frissíteni a készletet.');
     }
@@ -69,7 +62,6 @@ const HardwareHubAPI = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ statusz })
     });
-
     if (!response.ok) {
       throw new Error('Nem sikerült módosítani a státuszt.');
     }
@@ -79,7 +71,6 @@ const HardwareHubAPI = {
     const response = await fetch(`${API_JAVITASOK_URL}/${id}`, {
       method: 'DELETE'
     });
-
     if (!response.ok) {
       throw new Error('Nem sikerült törölni a javítást.');
     }
@@ -87,6 +78,35 @@ const HardwareHubAPI = {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeIcon = document.getElementById('theme-icon');
+  const htmlElement = document.documentElement;
+
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  htmlElement.setAttribute('data-bs-theme', savedTheme);
+  updateThemeIcon(savedTheme);
+
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = htmlElement.getAttribute('data-bs-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      htmlElement.setAttribute('data-bs-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
+    });
+  }
+
+  function updateThemeIcon(theme) {
+    if (!themeIcon) return;
+    if (theme === 'dark') {
+      themeIcon.className = 'bi bi-sun-fill text-warning';
+    } else {
+      themeIcon.className = 'bi bi-moon-stars-fill text-secondary';
+    }
+  }
+
   const navLinks = document.querySelectorAll('#nav-links .nav-link');
   const pages = document.querySelectorAll('.page-section');
 
@@ -114,7 +134,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function populatePartDropdown(inventoryData) {
     const partSelect = document.getElementById('repair-part');
-
     if (!partSelect) return;
 
     partSelect.innerHTML = '<option value="">-- Nem igényel raktári alkatrészt --</option>';
@@ -143,6 +162,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         .getElementById(`page-${link.getAttribute('data-page')}`)
         .classList.remove('d-none');
 
+      const navbarCollapse = document.getElementById('navbarNav');
+      if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+        navbarCollapse.classList.remove('show');
+      }
+
       await refreshAllData();
     });
   });
@@ -167,7 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <tr>
         <td class="text-muted fw-bold">#${item.id}</td>
 
-        <td class="fw-bold text-dark">
+        <td class="fw-bold text-body">
           ${item.ugyfel_nev || 'Nincs név'}
         </td>
 
@@ -188,10 +212,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         <td>
           <select
-            class="form-select form-select-sm status-select ${
-              isActive ? 'bg-light' : 'bg-success text-white'
+            class="form-select form-select-sm status-select shadow-sm fw-bold ${
+              isActive ? 'bg-body border-0' : 'bg-success text-white border-success'
             }"
             data-id="${item.id}"
+            style="cursor: pointer; min-height: 35px;"
           >
             <option value="Alkatrészre vár"
               ${item.statusz === 'Alkatrészre vár' ? 'selected' : ''}>
@@ -238,7 +263,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (activeRepairs.length === 0) {
       tableBody.innerHTML = `
         <tr>
-          <td colspan="6" class="text-center py-4">
+          <td colspan="6" class="text-center py-4 text-muted">
             Nincs aktív munka.
           </td>
         </tr>
@@ -248,7 +273,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (completedRepairs.length === 0) {
       archiveTableBody.innerHTML = `
         <tr>
-          <td colspan="6" class="text-center py-4">
+          <td colspan="6" class="text-center py-4 text-muted">
             Az archívum üres.
           </td>
         </tr>
@@ -292,10 +317,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         <tr class="${isCritical ? 'table-danger' : ''}">
           <td class="text-muted fw-bold">#${item.id}</td>
 
-          <td class="fw-bold">${item.alkatresz_nev}</td>
+          <td class="fw-bold text-body">${item.alkatresz_nev}</td>
 
           <td class="text-center fs-6 fw-bold ${
-            isCritical ? 'text-danger' : 'text-dark'
+            isCritical ? 'text-danger' : 'text-body'
           }">
             ${qty}
           </td>
@@ -306,13 +331,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             ${
               isCritical
                 ? `
-                  <span class="text-danger fw-bold">
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
                     <i class="bi bi-exclamation-triangle-fill"></i>
-                    Beszerzés szükséges!
+                    Beszerzés!
                   </span>
                 `
                 : `
-                  <span class="text-success fw-bold">
+                  <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
                     <i class="bi bi-check-circle-fill"></i>
                     Megfelelő
                   </span>
@@ -328,7 +353,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               title="Készlet növelése"
             >
               <i class="bi bi-plus-lg"></i>
-              Darab hozzáadása
+              Darab
             </button>
           </td>
         </tr>
