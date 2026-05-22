@@ -1,3 +1,7 @@
+-- Ez az SQL adatbázis a projekt fejlesztése és tesztelése során volt használatban, de a végső rendszer a Retool API-n keresztül kommunikál az adatbázissal.
+
+-- Csak dokumentáció / referencia célból van itt.
+
 -- 1. RAKTÁR TÁBLA
 CREATE TABLE raktar (
     id SERIAL PRIMARY KEY,
