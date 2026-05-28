@@ -1,192 +1,247 @@
 <!doctype html>
 <html lang="hu" data-bs-theme="light">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>HardwareHub Inventory</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HardwareHub Inventory</title>
 </head>
 <body class="bg-body-tertiary">
 
-  <nav class="navbar navbar-expand-lg sticky-top shadow-sm" id="main-navbar">
-    <div class="container-fluid px-4">
+    <div id="selector-top-controls" class="position-fixed top-0 end-0 p-3 z-3">
+        <button class="btn btn-sm btn-theme rounded-circle shadow-sm" data-theme-toggle>
+            <i class="bi bi-moon-stars-fill" data-theme-icon></i>
+        </button>
+    </div>
 
-      <span class="navbar-brand d-flex align-items-center fw-bold user-select-none">
-        <i class="bi bi-cpu-fill fs-3 me-2 text-primary"></i>
-        HardwareHub
-      </span>
-
-      <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-2 mt-3 mt-lg-0" id="nav-links">
-          <li class="nav-item">
-            <button class="nav-link active border-0 bg-transparent text-start w-100" data-page="dashboard">
-              <i class="bi bi-speedometer2 me-1"></i> Aktív Javítások
+    <nav class="navbar sticky-top shadow-sm d-none" id="user-navbar">
+        <div class="container-fluid px-4">
+            <button id="return-to-menu-user" class="navbar-brand d-flex align-items-center fw-bold user-select-none border-0 bg-transparent">
+                <i class="bi bi-cpu-fill fs-3 me-2 text-primary"></i>
+                HardwareHub
             </button>
-          </li>
-          <li class="nav-item">
-            <button class="nav-link border-0 bg-transparent text-start w-100" data-page="archivum">
-              <i class="bi bi-archive me-1"></i> Kész Munkák
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-sm btn-theme rounded-circle shadow-sm" data-theme-toggle>
+                    <i class="bi bi-moon-stars-fill" data-theme-icon></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <section id="role-selector-screen" class="min-vh-100 d-flex align-items-center justify-content-center px-3">
+        <div class="choice-card card shadow border-0 p-4 p-md-5 text-center">
+            <div class="mb-4">
+                <div class="logo-badge mx-auto mb-3">
+                    <i class="bi bi-cpu-fill"></i>
+                </div>
+                <h1 class="h3 fw-bold mb-1">HardwareHub</h1>
+                <p class="text-muted mb-0">Válassz belépési módot</p>
+            </div>
+            <div class="d-grid gap-3">
+                <button id="enter-admin-mode" class="btn btn-primary btn-lg">
+                    Belépés rendszergazdaként
+                </button>
+                <button id="enter-user-mode" class="btn btn-outline-primary btn-lg">
+                    Felhasználói felület (új szervizigény)
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <nav class="navbar navbar-expand-lg sticky-top shadow-sm d-none" id="main-navbar">
+        <div class="container-fluid px-4">
+
+            <button id="return-to-menu-admin" class="navbar-brand d-flex align-items-center fw-bold user-select-none border-0 bg-transparent">
+                <i class="bi bi-cpu-fill fs-3 me-2 text-primary"></i>
+                HardwareHub
             </button>
-          </li>
-          <li class="nav-item">
-            <button class="nav-link border-0 bg-transparent text-start w-100" data-page="raktar">
-              <i class="bi bi-box-seam me-1"></i> Raktárkészlet
+
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
             </button>
-          </li>
-          <li class="nav-item">
-            <button class="nav-link border-0 bg-transparent text-start w-100" data-page="adatfelvetel">
-              <i class="bi bi-plus-circle me-1"></i> Adatfelvétel
-            </button>
-          </li>
-        </ul>
 
-        <div class="d-flex align-items-center gap-3">
-          <button id="theme-toggle" class="btn btn-sm btn-theme rounded-circle shadow-sm">
-            <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </nav>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-2 mt-3 mt-lg-0" id="nav-links">
+                    <li class="nav-item">
+                        <button class="nav-link active border-0 bg-transparent text-start w-100" data-page="dashboard">
+                            <i class="bi bi-speedometer2 me-1"></i> Aktív Javítások
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link border-0 bg-transparent text-start w-100" data-page="archivum">
+                            <i class="bi bi-archive me-1"></i> Kész Munkák
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link border-0 bg-transparent text-start w-100" data-page="raktar">
+                            <i class="bi bi-box-seam me-1"></i> Raktárkészlet
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link border-0 bg-transparent text-start w-100" data-page="adatfelvetel">
+                            <i class="bi bi-plus-circle me-1"></i> Adatfelvétel
+                        </button>
+                    </li>
+                </ul>
 
-  <main class="container-fluid px-4 py-4" id="page-content-wrapper">
-
-    <div id="page-dashboard" class="page-section">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h1 class="h3 fw-bold mb-1">Aktív Javítások</h1>
-          <p class="text-muted mb-0 small">Folyamatban lévő és alkatrészre váró munkák.</p>
-        </div>
-        <span class="badge bg-primary-subtle text-primary border border-primary-subtle fs-6" id="total-repairs-count">0 db aktív</span>
-      </div>
-
-      <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body">
-          <div class="input-group input-group-lg search-group">
-            <span class="input-group-text border-0 text-muted"><i class="bi bi-search"></i></span>
-            <input type="text" id="search-input" class="form-control border-0 shadow-none" placeholder="Keresés ügyfél vagy eszköz alapján..."/>
-          </div>
-        </div>
-      </div>
-
-      <div class="card shadow-sm border-0 overflow-hidden">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="small text-uppercase text-secondary">
-              <tr>
-                <th>ID</th><th>Ügyfél</th><th>Eszköz</th><th>Hiba</th><th>Státusz</th><th class="text-end">Törlés</th>
-              </tr>
-            </thead>
-            <tbody id="repairs-table-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div id="page-archivum" class="page-section d-none">
-      <div class="mb-4">
-        <h1 class="h3 fw-bold mb-1">Kész Munkák</h1>
-        <p class="text-muted mb-0 small">Befejezett és átadott javítások.</p>
-      </div>
-      <div class="card shadow-sm border-0 overflow-hidden">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="small text-uppercase text-secondary">
-              <tr>
-                <th>ID</th><th>Ügyfél</th><th>Eszköz</th><th>Hiba</th><th>Státusz</th><th class="text-end">Törlés</th>
-              </tr>
-            </thead>
-            <tbody id="archive-table-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div id="page-raktar" class="page-section d-none">
-      <div class="mb-4">
-        <h1 class="h3 fw-bold mb-1">Raktárkészlet</h1>
-        <p class="text-muted mb-0 small">Elérhető alkatrészek kezelése.</p>
-      </div>
-      <div class="card shadow-sm border-0 overflow-hidden">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0" id="inventory-table">
-            <thead class="small text-uppercase text-secondary">
-              <tr>
-                <th>ID</th><th>Alkatrész</th><th class="text-center">Készlet (db)</th><th class="text-center">Kritikus szint</th><th>Állapot</th><th class="text-end">Művelet</th>
-              </tr>
-            </thead>
-            <tbody id="inventory-table-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div id="page-adatfelvetel" class="page-section d-none">
-      <div class="mb-4">
-        <h1 class="h3 fw-bold mb-1">Új Adatok Rögzítése</h1>
-        <p class="text-muted mb-0 small">Új javítás vagy alkatrész hozzáadása.</p>
-      </div>
-      <div class="row g-4">
-        <div class="col-lg-6">
-          <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-transparent border-bottom py-3 px-4">
-              <span class="fw-bold"><i class="bi bi-tools text-primary me-2"></i>Új szervizigény</span>
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-sm btn-theme rounded-circle shadow-sm" data-theme-toggle>
+                        <i class="bi bi-moon-stars-fill" data-theme-icon></i>
+                    </button>
+                </div>
             </div>
-            <div class="card-body p-4">
-              <form id="form-new-repair" class="needs-validation" novalidate>
-                <div class="mb-3">
-                  <label class="form-label fw-medium">Ügyfél neve</label>
-                  <input type="text" class="form-control border-0" id="repair-client" placeholder="Pl. Kiss Gábor" required/>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label fw-medium">Eszköz típusa</label>
-                  <input type="text" class="form-control border-0" id="repair-device" placeholder="Pl. ASUS ZenBook Laptop" required/>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label fw-medium">Alkatrész (raktárból)</label>
-                  <select class="form-select border-0" id="repair-part"></select>
-                </div>
-                <div class="mb-4">
-                  <label class="form-label fw-medium">Hiba leírása</label>
-                  <textarea class="form-control border-0" id="repair-description" rows="3" placeholder="Mi a probléma az eszközzel?"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary w-100 py-2">Rögzítés</button>
-              </form>
-            </div>
-          </div>
         </div>
-        <div class="col-lg-6">
-          <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-transparent border-bottom py-3 px-4">
-              <span class="fw-bold"><i class="bi bi-box-seam text-success me-2"></i>Új alkatrész</span>
+    </nav>
+
+    <main class="container-fluid px-4 py-4 d-none" id="page-content-wrapper">
+
+        <div id="page-dashboard" class="page-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 fw-bold mb-1">Aktív Javítások</h1>
+                    <p class="text-muted mb-0 small">Folyamatban lévő és alkatrészre váró munkák.</p>
+                </div>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle fs-6" id="total-repairs-count">0 db aktív</span>
             </div>
-            <div class="card-body p-4">
-              <form id="form-new-part" class="needs-validation" novalidate>
-                <div class="mb-3">
-                  <label class="form-label fw-medium">Alkatrész neve</label>
-                  <input type="text" class="form-control border-0" id="part-name" placeholder="Pl. Kingston 1TB SSD" required/>
+
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <div class="input-group input-group-lg search-group">
+                        <span class="input-group-text border-0 text-muted"><i class="bi bi-search"></i></span>
+                        <input type="text" id="search-input" class="form-control border-0 shadow-none" placeholder="Keresés ügyfél vagy eszköz alapján..." />
+                    </div>
                 </div>
-                <div class="mb-3">
-                  <label class="form-label fw-medium">Kezdő darabszám</label>
-                  <input type="number" class="form-control border-0" id="part-qty" min="0" placeholder="0" required/>
-                </div>
-                <div class="mb-4">
-                  <label class="form-label fw-medium">Kritikus minimum szint</label>
-                  <input type="number" class="form-control border-0" id="part-limit" min="1" value="1" placeholder="1" required/>
-                </div>
-                <button type="submit" class="btn btn-success w-100 py-2">Hozzáadás</button>
-              </form>
             </div>
-          </div>
+
+            <div class="card shadow-sm border-0 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="small text-uppercase text-secondary">
+                            <tr>
+                                <th>ID</th>
+                                <th>Ügyfél</th>
+                                <th>Eszköz</th>
+                                <th>Hiba</th>
+                                <th>Státusz</th>
+                                <th class="text-end">Törlés</th>
+                            </tr>
+                        </thead>
+                        <tbody id="repairs-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-  </main>
+        <div id="page-archivum" class="page-section d-none">
+            <div class="mb-4">
+                <h1 class="h3 fw-bold mb-1">Kész Munkák</h1>
+                <p class="text-muted mb-0 small">Befejezett és átadott javítások.</p>
+            </div>
+            <div class="card shadow-sm border-0 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="small text-uppercase text-secondary">
+                            <tr>
+                                <th>ID</th>
+                                <th>Ügyfél</th>
+                                <th>Eszköz</th>
+                                <th>Hiba</th>
+                                <th>Státusz</th>
+                                <th class="text-end">Törlés</th>
+                            </tr>
+                        </thead>
+                        <tbody id="archive-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-  <script type="module" src="/src/main.js"></script>
+        <div id="page-raktar" class="page-section d-none">
+            <div class="mb-4">
+                <h1 class="h3 fw-bold mb-1">Raktárkészlet</h1>
+                <p class="text-muted mb-0 small">Elérhető alkatrészek kezelése.</p>
+            </div>
+            <div class="card shadow-sm border-0 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="inventory-table">
+                        <thead class="small text-uppercase text-secondary">
+                            <tr>
+                                <th>ID</th>
+                                <th>Alkatrész</th>
+                                <th class="text-center">Készlet (db)</th>
+                                <th class="text-center">Kritikus szint</th>
+                                <th>Állapot</th>
+                                <th class="text-end">Művelet</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-adatfelvetel" class="page-section d-none">
+            <div class="mb-4">
+                <h1 class="h3 fw-bold mb-1">Új Adatok Rögzítése</h1>
+                <p class="text-muted mb-0 small">Új javítás vagy alkatrész hozzáadása.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-6" id="new-repair-column">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-transparent border-bottom py-3 px-4">
+                            <span class="fw-bold"><i class="bi bi-tools text-primary me-2"></i>Új szervizigény</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <form id="form-new-repair" class="needs-validation" novalidate>
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Ügyfél neve</label>
+                                    <input type="text" class="form-control border-0" id="repair-client" placeholder="Pl. Kiss Gábor" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Eszköz típusa</label>
+                                    <input type="text" class="form-control border-0" id="repair-device" placeholder="Pl. ASUS ZenBook Laptop" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Alkatrész (raktárból)</label>
+                                    <select class="form-select border-0" id="repair-part"></select>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label fw-medium">Hiba leírása</label>
+                                    <textarea class="form-control border-0" id="repair-description" rows="3" placeholder="Mi a probléma az eszközzel?"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 py-2">Rögzítés</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6" id="new-part-column">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-transparent border-bottom py-3 px-4">
+                            <span class="fw-bold"><i class="bi bi-box-seam text-success me-2"></i>Új alkatrész</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <form id="form-new-part" class="needs-validation" novalidate>
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Alkatrész neve</label>
+                                    <input type="text" class="form-control border-0" id="part-name" placeholder="Pl. Kingston 1TB SSD" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Kezdő darabszám</label>
+                                    <input type="number" class="form-control border-0" id="part-qty" min="0" placeholder="0" required />
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label fw-medium">Kritikus minimum szint</label>
+                                    <input type="number" class="form-control border-0" id="part-limit" min="1" value="1" placeholder="1" required />
+                                </div>
+                                <button type="submit" class="btn btn-success w-100 py-2">Hozzáadás</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
 </body>
 </html>
